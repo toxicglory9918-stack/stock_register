@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>JK_Ambedkarnagar | Stock Management</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700;900&display=swap');
+
+:root {
+  --black:    #0a0800;
+  --black2:   #110e00;
+  --black3:   #1a1600;
+  --gold:     #c9a84c;
+  --gold2:    #e8c86a;
+  --gold-dim: #7a6428;
+  --text:     #f0e6c8;
+  --text-dim: #8a7a52;
+  --border:   rgba(201,168,76,0.18);
+  --border2:  rgba(201,168,76,0.35);
+  --red:      #c0392b;
+  --green:    #27ae60;
+  --shadow:   0 8px 40px rgba(0,0,0,0.7);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Montserrat',sans-serif;background:var(--black);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+.bg-pattern{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(201,168,76,0.035) 60px),repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(201,168,76,0.035) 60px);background-size:60px 60px;}
+.bg-vignette{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,0.88) 100%);}
+.bg-glow{position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:450px;background:radial-gradient(ellipse,rgba(201,168,76,0.07) 0%,transparent 70%);z-index:0;pointer-events:none;animation:glowPulse 8s ease-in-out infinite;}
+@keyframes glowPulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+.page{position:fixed;inset:0;z-index:10;display:none;overflow-y:auto;}
+.page.active{display:flex;}
+
+/* ── LOGIN ── */
+#loginPage{align-items:center;justify-content:center;background:var(--black);animation:pgFade .7s ease;}
+@keyframes pgFade{from{opacity:0}to{opacity:1}}
+.login-wrap{width:100%;max-width:1040px;margin:20px;display:grid;grid-template-columns:1.1fr 1fr;min-height:610px;border-radius:4px;border:1px solid var(--border2);overflow:hidden;box-shadow:0 0 0 1px rgba(201,168,76,0.06),var(--shadow),0 0 100px rgba(201,168,76,0.05);animation:loginRise .9s cubic-bezier(.16,1,.3,1) .1s both;}
+@keyframes loginRise{from{opacity:0;transform:translateY(28px) scale(.98)}to{opacity:1;transform:none}}
+.login-left{background:linear-gradient(155deg,#110e00 0%,#0a0800 45%,#181400 100%);padding:60px 52px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;border-right:1px solid var(--border);}
+.login-left::before{content:'';position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1553413077-190dd305871c?w=700&q=70&auto=format') center/cover;opacity:.055;filter:sepia(1) saturate(.4);}
+.ll{position:relative;z-index:1;}
+.ll-badge{display:inline-flex;align-items:center;gap:8px;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:38px;padding:7px 16px;border:1px solid rgba(201,168,76,0.22);border-radius:2px;background:rgba(201,168,76,0.04);}
+.ll-badge::before{content:'◆';font-size:8px;}
+.ll-title{font-family:'Playfair Display',serif;font-size:clamp(34px,3.8vw,54px);font-weight:900;line-height:1.1;margin-bottom:20px;color:var(--gold2);text-shadow:0 0 50px rgba(201,168,76,0.25);}
+.ll-title span{display:block;color:var(--text);font-size:.62em;font-weight:400;letter-spacing:3px;margin-top:4px;}
+.ll-desc{font-size:13px;color:var(--text-dim);line-height:1.85;margin-bottom:38px;max-width:300px;}
+.ll-rule{height:1px;background:linear-gradient(90deg,var(--gold-dim),transparent);margin-bottom:30px;}
+.ll-stats{display:flex;gap:20px;flex-wrap:wrap;}
+.ll-s{padding:14px 20px;background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.1);border-radius:3px;}
+.ll-s .n{font-family:'Cinzel',serif;font-size:24px;font-weight:700;color:var(--gold);line-height:1;}
+.ll-s .l{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-top:4px;}
+.login-right{background:linear-gradient(155deg,#0f0c00 0%,#080600 100%);padding:56px 48px;display:flex;flex-direction:column;justify-content:center;}
+.auth-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:38px;}
+.tab-btn{flex:1;padding:13px 8px;background:transparent;border:none;font-family:'Cinzel',serif;font-size:11px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-dim);cursor:pointer;transition:all .3s;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tab-btn:hover:not(.active){color:var(--gold2);}
+.auth-form{display:none;}
+.auth-form.active{display:block;animation:formSl .4s ease;}
+@keyframes formSl{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
+.form-heading{font-family:'Playfair Display',serif;font-size:27px;font-weight:700;color:var(--gold2);margin-bottom:6px;}
+.form-sub{font-size:12px;color:var(--text-dim);letter-spacing:.4px;margin-bottom:30px;}
+.field{margin-bottom:18px;}
+.field label{display:block;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold-dim);margin-bottom:8px;}
+.field input{width:100%;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.14);border-radius:2px;padding:12px 16px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:14px;outline:none;transition:all .3s;}
+.field input:focus{border-color:var(--gold);background:rgba(201,168,76,0.07);box-shadow:0 0 0 3px rgba(201,168,76,0.07);}
+.field input::placeholder{color:rgba(138,122,82,0.45);}
+.btn-auth{width:100%;padding:14px;margin-top:8px;background:linear-gradient(135deg,var(--gold) 0%,#9a7228 100%);border:none;border-radius:2px;color:#0a0800;font-family:'Cinzel',serif;font-size:12px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;transition:all .3s;box-shadow:0 4px 20px rgba(201,168,76,0.18);}
+.btn-auth:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(201,168,76,0.32);}
+.btn-auth:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.msg{border-radius:2px;padding:10px 14px;font-size:12px;font-weight:600;letter-spacing:.3px;margin-bottom:16px;display:none;}
+.msg.show{display:block;animation:shakeanim .4s ease;}
+.msg.err{background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.28);color:#e74c3c;}
+.msg.ok{background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.28);color:#2ecc71;}
+@keyframes shakeanim{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
+/* ── WELCOME ── */
+#welcomePage{background:var(--black);flex-direction:column;align-items:center;justify-content:center;z-index:20;}
+.wc{text-align:center;padding:20px;}
+.wc-crest{width:84px;height:84px;margin:0 auto 34px;border:2px solid var(--gold-dim);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--gold);position:relative;animation:crestAnim 1.2s cubic-bezier(.16,1,.3,1);box-shadow:0 0 40px rgba(201,168,76,0.15);}
+.wc-crest::before,.wc-crest::after{content:'';position:absolute;border-radius:50%;border:1px solid;}
+.wc-crest::before{inset:-8px;border-color:rgba(201,168,76,0.12);}
+.wc-crest::after{inset:-16px;border-color:rgba(201,168,76,0.06);}
+@keyframes crestAnim{from{transform:rotate(-180deg) scale(0);opacity:0}to{transform:none;opacity:1}}
+.wc-brand{font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:6px;color:var(--gold);text-transform:uppercase;margin-bottom:22px;animation:fadeUpAnim .8s ease .3s both;}
+.wc-name{font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,58px);font-weight:900;color:var(--gold2);text-shadow:0 0 60px rgba(201,168,76,0.35);animation:fadeUpAnim .8s ease .5s both;margin-bottom:14px;}
+.wc-sub{font-size:14px;color:var(--text-dim);animation:fadeUpAnim .8s ease .7s both;margin-bottom:50px;}
+.wc-bar-wrap{width:300px;margin:0 auto;height:2px;background:rgba(201,168,76,0.1);border-radius:1px;animation:fadeUpAnim .8s ease .9s both;overflow:hidden;}
+.wc-bar{height:100%;width:0%;border-radius:1px;background:linear-gradient(90deg,var(--gold),var(--gold2));animation:barFillAnim 2.3s ease-in-out .9s both;}
+@keyframes barFillAnim{0%{width:0%}100%{width:100%}}
+@keyframes fadeUpAnim{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.wc-dots{display:flex;justify-content:center;gap:8px;margin-top:22px;animation:fadeUpAnim .8s ease 1.1s both;}
+.wc-dots span{width:6px;height:6px;border-radius:50%;background:var(--gold);opacity:.3;animation:dotAnim 1.2s ease-in-out infinite;}
+.wc-dots span:nth-child(2){animation-delay:.2s;}
+.wc-dots span:nth-child(3){animation-delay:.4s;}
+@keyframes dotAnim{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+
+/* ── DASHBOARD ── */
+#dashboardPage{flex-direction:column;background:var(--black);}
+.navbar{background:rgba(10,8,0,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 36px;height:66px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-shrink:0;}
+.nav-brand{font-family:'Cinzel',serif;font-size:17px;font-weight:700;letter-spacing:3px;color:var(--gold);text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+.nav-brand::before{content:'◆';font-size:9px;color:var(--gold-dim);}
+.nav-right{display:flex;align-items:center;gap:14px;}
+.nav-user{display:flex;align-items:center;gap:10px;background:rgba(201,168,76,0.05);border:1px solid var(--border);border-radius:2px;padding:8px 18px;font-size:13px;font-weight:600;color:var(--text-dim);}
+.nav-av{width:30px;height:30px;border-radius:2px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:#0a0800;}
+.btn-logout{background:rgba(192,57,43,0.07);border:1px solid rgba(192,57,43,0.22);color:#e74c3c;padding:8px 22px;border-radius:2px;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .3s;}
+.btn-logout:hover{background:rgba(192,57,43,0.16);}
+.dash-main{flex:1;padding:32px 36px;max-width:1500px;margin:0 auto;width:100%;}
+.dash-banner{background:linear-gradient(110deg,#141000 0%,#1c1800 50%,#0f0c00 100%);border:1px solid var(--border);border-radius:4px;padding:26px 36px;margin-bottom:36px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;}
+.dash-banner::before{content:'';position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1000&q=55&auto=format') center/cover;opacity:.042;filter:sepia(1);}
+.banner-text{position:relative;z-index:1;}
+.banner-text h2{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--gold2);margin-bottom:5px;}
+.banner-text p{font-size:13px;color:var(--text-dim);}
+.banner-clock{font-family:'Cinzel',serif;font-size:13px;color:var(--gold-dim);letter-spacing:2px;position:relative;z-index:1;border:1px solid var(--border);padding:8px 18px;border-radius:2px;background:rgba(201,168,76,0.04);}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+.sec-title{font-family:'Cinzel',serif;font-size:12px;font-weight:700;letter-spacing:3.5px;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:12px;}
+.sec-title::after{content:'◆';font-size:7px;color:var(--gold-dim);}
+.search-input{background:rgba(201,168,76,0.04);border:1px solid var(--border);border-radius:2px;padding:10px 16px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:13px;outline:none;width:230px;transition:all .3s;}
+.search-input:focus{border-color:var(--gold);width:270px;}
+.search-input::placeholder{color:var(--text-dim);}
+
+/* Stock cards */
+.stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px;margin-bottom:44px;}
+.stock-card{background:linear-gradient(150deg,#181400 0%,#0e0b00 100%);border:1px solid var(--border);border-radius:4px;overflow:hidden;display:flex;flex-direction:column;transition:transform .3s,box-shadow .3s,border-color .3s;animation:cardRise .45s cubic-bezier(.16,1,.3,1) both;position:relative;}
+.stock-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,0.035) 0%,transparent 55%);pointer-events:none;z-index:0;}
+.stock-card>*{position:relative;z-index:1;}
+.stock-card:hover{transform:translateY(-5px);border-color:rgba(201,168,76,0.42);box-shadow:0 16px 48px rgba(0,0,0,0.65),0 0 35px rgba(201,168,76,0.07);}
+@keyframes cardRise{from{opacity:0;transform:translateY(22px) scale(.95)}to{opacity:1;transform:none}}
+.card-photo{width:100%;height:170px;overflow:hidden;background:rgba(201,168,76,0.03);display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border);flex-shrink:0;}
+.card-photo img{width:100%;height:100%;object-fit:cover;}
+.card-photo .no-photo{font-size:52px;opacity:.25;}
+.card-body{padding:16px 18px 12px;flex:1;display:flex;flex-direction:column;}
+.card-name{font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:var(--gold2);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card-desc{font-size:11px;color:var(--text-dim);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:12px;flex:1;}
+.card-foot{display:flex;align-items:center;justify-content:space-between;}
+.qty-pill{font-family:'Cinzel',serif;font-size:11px;font-weight:700;padding:4px 12px;border-radius:2px;}
+.qty-pill.ok{background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.22);color:#2ecc71;}
+.qty-pill.low{background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.22);color:#e74c3c;}
+.card-date{font-size:10px;color:var(--text-dim);}
+.card-actions{display:flex;gap:8px;padding:12px 18px 16px;border-top:1px solid rgba(201,168,76,0.07);}
+.c-btn{flex:1;padding:8px 0;border:none;border-radius:2px;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.c-btn.edit{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.18);color:var(--gold);}
+.c-btn.edit:hover{background:rgba(201,168,76,0.16);}
+.c-btn.del{background:rgba(192,57,43,0.07);border:1px solid rgba(192,57,43,0.18);color:#e74c3c;}
+.c-btn.del:hover{background:rgba(192,57,43,0.16);}
+.empty-grid{grid-column:1/-1;text-align:center;padding:70px 20px;color:var(--text-dim);border:1px dashed rgba(201,168,76,0.09);border-radius:4px;}
+.empty-grid .ei{font-size:52px;margin-bottom:18px;opacity:.3;}
+.empty-grid p{font-size:13px;letter-spacing:.5px;line-height:1.8;}
+
+/* Loading spinner */
+.loading-grid{grid-column:1/-1;text-align:center;padding:60px;color:var(--text-dim);}
+.spinner{width:36px;height:36px;border:2px solid rgba(201,168,76,0.15);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Bottom row */
+.bottom-row{display:grid;grid-template-columns:340px 1fr;gap:24px;align-items:start;}
+.stats-panel,.add-panel{background:linear-gradient(150deg,#181400,#0e0b00);border:1px solid var(--border);border-radius:4px;padding:30px 28px;}
+.stat-row{display:flex;align-items:center;gap:18px;padding:18px 0;border-bottom:1px solid rgba(201,168,76,0.07);}
+.stat-row:first-of-type{padding-top:0;}
+.stat-row:last-child{border-bottom:none;padding-bottom:0;}
+.stat-ico{width:46px;height:46px;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.stat-ico.g{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.14);}
+.stat-ico.gr{background:rgba(39,174,96,0.07);border:1px solid rgba(39,174,96,0.14);}
+.stat-ico.r{background:rgba(192,57,43,0.07);border:1px solid rgba(192,57,43,0.14);}
+.stat-info .v{font-family:'Cinzel',serif;font-size:30px;font-weight:700;color:var(--gold2);line-height:1;}
+.stat-info .l{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-top:4px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.form-grid .full{grid-column:1/-1;}
+.af{margin-bottom:0;}
+.af label{display:block;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dim);margin-bottom:8px;}
+.af input,.af textarea{width:100%;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.12);border-radius:2px;padding:12px 14px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:13px;outline:none;transition:all .3s;resize:none;}
+.af input:focus,.af textarea:focus{border-color:var(--gold);background:rgba(201,168,76,0.07);box-shadow:0 0 0 3px rgba(201,168,76,0.06);}
+.af input::placeholder,.af textarea::placeholder{color:rgba(138,122,82,0.4);}
+.photo-zone{border:1.5px dashed rgba(201,168,76,0.18);border-radius:3px;padding:20px;text-align:center;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;background:rgba(201,168,76,0.02);}
+.photo-zone:hover{border-color:var(--gold);background:rgba(201,168,76,0.04);}
+.photo-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:2;}
+.pz-icon{font-size:26px;margin-bottom:7px;}
+.photo-zone p{font-size:11px;color:var(--text-dim);}
+.photo-prev-img{width:100%;height:90px;object-fit:cover;border-radius:2px;margin-top:12px;display:none;border:1px solid var(--border);}
+.add-err{font-size:12px;color:#e74c3c;margin-top:10px;display:none;text-align:center;}
+.add-err.show{display:block;animation:shakeanim .4s ease;}
+.btn-add{width:100%;padding:14px;margin-top:18px;background:linear-gradient(135deg,var(--gold) 0%,#9a7228 100%);border:none;border-radius:2px;color:#0a0800;font-family:'Cinzel',serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all .3s;box-shadow:0 4px 20px rgba(201,168,76,0.14);}
+.btn-add:hover{transform:translateY(-2px);box-shadow:0 10px 34px rgba(201,168,76,0.28);}
+.btn-add:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+/* Modals */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);backdrop-filter:blur(10px);z-index:200;align-items:center;justify-content:center;}
+.overlay.show{display:flex;animation:pgFade .3s ease;}
+.modal{background:linear-gradient(150deg,#181400,#0e0b00);border:1px solid var(--border2);border-radius:4px;padding:38px;width:90%;max-width:430px;box-shadow:var(--shadow),0 0 60px rgba(201,168,76,0.05);animation:modalAnim .35s cubic-bezier(.16,1,.3,1);}
+@keyframes modalAnim{from{transform:scale(.88) translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.modal h3{font-family:'Playfair Display',serif;font-size:23px;font-weight:700;color:var(--gold2);margin-bottom:9px;}
+.modal p{font-size:13px;color:var(--text-dim);margin-bottom:28px;line-height:1.65;}
+.modal-inp{width:100%;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.14);border-radius:2px;padding:12px 14px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:13px;outline:none;margin-bottom:12px;transition:all .3s;resize:none;}
+.modal-inp:focus{border-color:var(--gold);}
+.modal-acts{display:flex;gap:12px;margin-top:4px;}
+.btn-cncl{flex:1;padding:12px;border-radius:2px;cursor:pointer;transition:all .3s;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);color:var(--text-dim);font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:2px;}
+.btn-cncl:hover{border-color:rgba(255,255,255,0.2);color:var(--text);}
+.btn-del-c{flex:1;padding:12px;border:none;border-radius:2px;cursor:pointer;transition:all .3s;background:linear-gradient(135deg,#c0392b,#8e1c13);color:#fff;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:2px;}
+.btn-del-c:hover{box-shadow:0 8px 24px rgba(192,57,43,0.3);transform:translateY(-1px);}
+.btn-save{flex:1;padding:12px;border:none;border-radius:2px;cursor:pointer;transition:all .3s;background:linear-gradient(135deg,var(--gold),#9a7228);color:#0a0800;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:2px;}
+.btn-save:hover{box-shadow:0 8px 24px rgba(201,168,76,0.28);transform:translateY(-1px);}
+
+/* Toast */
+.toast-wrap{position:fixed;bottom:28px;right:28px;z-index:300;display:flex;flex-direction:column;gap:10px;}
+.toast{background:linear-gradient(145deg,#181400,#0e0b00);border:1px solid var(--border);border-radius:3px;padding:14px 20px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,0.65);animation:toastSlide .4s cubic-bezier(.16,1,.3,1);max-width:300px;}
+@keyframes toastSlide{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+.toast.s{border-color:rgba(39,174,96,.32);}
+.toast.s::before{content:'◆';color:#2ecc71;font-size:11px;}
+.toast.e{border-color:rgba(192,57,43,.32);}
+.toast.e::before{content:'✕';color:#e74c3c;}
+.toast.i{border-color:var(--border2);}
+.toast.i::before{content:'◆';color:var(--gold);font-size:11px;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(201,168,76,0.18);border-radius:2px;}
+@media(max-width:1050px){.bottom-row{grid-template-columns:1fr;}}
+@media(max-width:860px){.login-wrap{grid-template-columns:1fr;}.login-left{display:none;}.dash-main{padding:16px;}.navbar{padding:0 16px;}.form-grid{grid-template-columns:1fr;}}
+@media(max-width:560px){.stock-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));}.banner-clock{display:none;}}
+</style>
+</head>
+<body>
+<div class="bg-pattern"></div>
+<div class="bg-vignette"></div>
+<div class="bg-glow"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- ═══ LOGIN ═══ -->
+<div class="page active" id="loginPage">
+  <div class="login-wrap">
+    <div class="login-left">
+      <div class="ll">
+        <div class="ll-badge">JK_Ambedkarnagar</div>
+        <div class="ll-title">Stock<br/>Management<br/><span>System</span></div>
+        <p class="ll-desc">A premium inventory control platform — track and manage your stock with confidence and precision.</p>
+        <div class="ll-rule"></div>
+        <div class="ll-stats">
+          <div class="ll-s"><div class="n" id="ls-items">—</div><div class="l">Items</div></div>
+          <div class="ll-s"><div class="n">1</div><div class="l">Admin</div></div>
+          <div class="ll-s"><div class="n">24/7</div><div class="l">Access</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="login-right">
+      <div class="auth-tabs">
+        <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+        <button class="tab-btn" onclick="switchTab('signup')">Sign Up</button>
+      </div>
+      <div class="auth-form active" id="loginForm">
+        <div class="form-heading">Welcome Back</div>
+        <div class="form-sub">Sign in with your administrator credentials</div>
+        <div class="msg err" id="loginErr"></div>
+        <div class="field"><label>Admin ID</label><input type="text" id="lId" placeholder="Enter Admin ID" autocomplete="off"/></div>
+        <div class="field"><label>Password</label><input type="password" id="lPass" placeholder="Enter Password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+        <button class="btn-auth" id="loginBtn" onclick="doLogin()">◆ &nbsp;Access System</button>
+      </div>
+      <div class="auth-form" id="signupForm">
+        <div class="form-heading">Request Access</div>
+        <div class="form-sub">Create a new administrator account</div>
+        <div class="msg err" id="signupErr"></div>
+        <div class="msg ok" id="signupOk"></div>
+        <div class="field"><label>Full Name</label><input type="text" id="sName" placeholder="Your full name"/></div>
+        <div class="field"><label>Admin ID</label><input type="text" id="sId" placeholder="Choose a unique ID" autocomplete="off"/></div>
+        <div class="field"><label>Password</label><input type="password" id="sPass" placeholder="Min 6 characters"/></div>
+        <div class="field"><label>Confirm Password</label><input type="password" id="sConf" placeholder="Repeat password" onkeydown="if(event.key==='Enter')doSignup()"/></div>
+        <button class="btn-auth" id="signupBtn" onclick="doSignup()">◆ &nbsp;Create Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ WELCOME ═══ -->
+<div class="page" id="welcomePage">
+  <div class="wc">
+    <div class="wc-crest">◆</div>
+    <div class="wc-brand">JK_Ambedkarnagar Stock Management</div>
+    <div class="wc-name" id="wcName">Welcome!</div>
+    <div class="wc-sub">Loading your dashboard from server…</div>
+    <div class="wc-bar-wrap"><div class="wc-bar"></div></div>
+    <div class="wc-dots"><span></span><span></span><span></span></div>
+  </div>
+</div>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div class="page" id="dashboardPage">
+  <nav class="navbar">
+    <div class="nav-brand">JK_Ambedkarnagar</div>
+    <div class="nav-right">
+      <div class="nav-user"><div class="nav-av" id="navAv">A</div><span id="navName">Admin</span></div>
+      <button class="btn-logout" onclick="doLogout()">⏻ &nbsp;Logout</button>
+    </div>
+  </nav>
+  <div class="dash-main">
+    <div class="dash-banner">
+      <div class="banner-text">
+        <h2>📦 &nbsp;Inventory Control</h2>
+        <p>Live data from Cloudflare D1 · JK_Ambedkarnagar</p>
+      </div>
+      <div class="banner-clock" id="clock"></div>
+    </div>
+
+    <!-- STOCK CARDS (TOP) -->
+    <div class="sec-head">
+      <div class="sec-title">Stock Inventory</div>
+      <input class="search-input" type="text" placeholder="🔍 Search items…" oninput="searchItems(this.value)"/>
+    </div>
+    <div class="stock-grid" id="stockGrid">
+      <div class="loading-grid"><div class="spinner"></div><p>Loading inventory…</p></div>
+    </div>
+
+    <!-- STATS + ADD FORM (BELOW) -->
+    <div class="bottom-row">
+      <div class="stats-panel">
+        <div class="sec-title" style="margin-bottom:20px;">Overview</div>
+        <div class="stat-row"><div class="stat-ico g">📦</div><div class="stat-info"><div class="v" id="sTot">—</div><div class="l">Total Items</div></div></div>
+        <div class="stat-row"><div class="stat-ico gr">▲</div><div class="stat-info"><div class="v" id="sQty">—</div><div class="l">Total Quantity</div></div></div>
+        <div class="stat-row"><div class="stat-ico r">!</div><div class="stat-info"><div class="v" id="sLow">—</div><div class="l">Low Stock (≤ 5)</div></div></div>
+      </div>
+      <div class="add-panel">
+        <div class="sec-title" style="margin-bottom:24px;">Add New Item</div>
+        <div class="form-grid">
+          <div class="af"><label>Item Name *</label><input type="text" id="aName" placeholder="e.g. Office Chair"/></div>
+          <div class="af"><label>Quantity *</label><input type="number" id="aQty" placeholder="e.g. 50" min="0"/></div>
+          <div class="af full"><label>Description</label><textarea id="aDesc" rows="2" placeholder="Short description…"></textarea></div>
+          <div class="af full">
+            <label>Item Photo</label>
+            <div class="photo-zone">
+              <input type="file" accept="image/*" id="aPhoto" onchange="pickPhoto(event)"/>
+              <div class="pz-icon">📷</div>
+              <p>Click to upload or drag &amp; drop</p>
+              <img class="photo-prev-img" id="photoPrev" alt="preview"/>
+            </div>
+          </div>
+        </div>
+        <div class="add-err" id="addErr">⚠ &nbsp;Item name and quantity are required.</div>
+        <button class="btn-add" id="addBtn" onclick="addItem()">◆ &nbsp;Add to Inventory</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="overlay" id="delOverlay">
+  <div class="modal">
+    <h3>Remove Item</h3>
+    <p id="delMsg">Are you sure you want to permanently remove this item?</p>
+    <div class="modal-acts">
+      <button class="btn-cncl" onclick="closeModal('delOverlay')">Cancel</button>
+      <button class="btn-del-c" id="delConfBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="overlay" id="editOverlay">
+  <div class="modal">
+    <h3>Edit Item</h3>
+    <p>Update the stock item details below.</p>
+    <input class="modal-inp" type="text" id="eName" placeholder="Item Name"/>
+    <input class="modal-inp" type="number" id="eQty" placeholder="Quantity" min="0"/>
+    <textarea class="modal-inp" id="eDesc" rows="2" placeholder="Description"></textarea>
+    <div class="modal-acts">
+      <button class="btn-cncl" onclick="closeModal('editOverlay')">Cancel</button>
+      <button class="btn-save" id="editSaveBtn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════
+   CONFIG — Replace with your Worker URL after deploy
+══════════════════════════════════════════════ */
+const API = 'https://jk-ambedkarnagar-stock.YOUR_SUBDOMAIN.workers.dev';
+// Example: 'https://jk-ambedkarnagar-stock.myname.workers.dev'
+
+/* ── Session (token stored in sessionStorage) ── */
+const SESS = 'jk_api_sess';
+const getSess   = () => { try { return JSON.parse(sessionStorage.getItem(SESS)); } catch { return null; } };
+const setSess   = u  => sessionStorage.setItem(SESS, JSON.stringify(u));
+const clrSess   = () => sessionStorage.removeItem(SESS);
+const getToken  = () => getSess()?.token || '';
+
+/* ── API helper ── */
+async function apiFetch(path, opts = {}) {
+  const res = await fetch(API + path, {
+    ...opts,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + getToken(),
+      ...(opts.headers || {}),
+    },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+/* ── DOM shortcuts ── */
+const $ = id => document.getElementById(id);
+
+function showMsg(id, txt, cls) { const e=$(id); e.className='msg '+cls+' show'; e.textContent=txt; }
+function hideMsg(id) { $(id).classList.remove('show'); }
+function showPage(id) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); $(id).classList.add('active'); }
+
+/* ── Tab switch ── */
+function switchTab(t) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', t==='login' ? i===0 : i===1));
+  $('loginForm').classList.toggle('active', t==='login');
+  $('signupForm').classList.toggle('active', t==='signup');
+  ['loginErr','signupErr','signupOk'].forEach(hideMsg);
+}
+
+/* ── LOGIN ── */
+async function doLogin() {
+  const id=$('lId').value.trim(), pass=$('lPass').value;
+  hideMsg('loginErr');
+  if (!id || !pass) { showMsg('loginErr','⚠ Please enter Admin ID and Password.','err'); return; }
+  const btn=$('loginBtn'); btn.disabled=true; btn.textContent='Verifying…';
+  try {
+    const data = await apiFetch('/auth/login', { method:'POST', body: JSON.stringify({id, pass}) });
+    setSess({ token: data.token, user: data.user });
+    showWelcome(data.user);
+  } catch(e) {
+    showMsg('loginErr', '✕  ' + e.message, 'err');
+  } finally {
+    btn.disabled=false; btn.innerHTML='◆ &nbsp;Access System';
+  }
+}
+
+/* ── SIGNUP ── */
+async function doSignup() {
+  const name=$('sName').value.trim(), id=$('sId').value.trim();
+  const pass=$('sPass').value, conf=$('sConf').value;
+  ['signupErr','signupOk'].forEach(hideMsg);
+  if (!name||!id||!pass||!conf) { showMsg('signupErr','⚠ All fields are required.','err'); return; }
+  if (pass !== conf) { showMsg('signupErr','✕ Passwords do not match.','err'); return; }
+  const btn=$('signupBtn'); btn.disabled=true; btn.textContent='Creating…';
+  try {
+    await apiFetch('/auth/signup', { method:'POST', body: JSON.stringify({id,pass,name}) });
+    showMsg('signupOk','✓  Account created! You can now sign in.','ok');
+    ['sName','sId','sPass','sConf'].forEach(x => $(x).value='');
+    setTimeout(() => switchTab('login'), 2000);
+  } catch(e) {
+    showMsg('signupErr', '✕  ' + e.message, 'err');
+  } finally {
+    btn.disabled=false; btn.innerHTML='◆ &nbsp;Create Account';
+  }
+}
+
+/* ── LOGOUT ── */
+function doLogout() {
+  clrSess();
+  showPage('loginPage');
+  $('lId').value=''; $('lPass').value='';
+  toast('Logged out successfully.','i');
+}
+
+/* ── WELCOME ── */
+function showWelcome(user) {
+  $('wcName').textContent = 'Welcome, ' + user.name + '!';
+  showPage('welcomePage');
+  setTimeout(() => { showPage('dashboardPage'); initDash(user); }, 2800);
+}
+
+async function initDash(user) {
+  $('navName').textContent = user.name;
+  $('navAv').textContent   = user.name.charAt(0).toUpperCase();
+  startClock();
+  await Promise.all([loadStats(), loadCards()]);
+}
+
+/* ── STATS ── */
+async function loadStats() {
+  try {
+    const data = await apiFetch('/stats');
+    $('sTot').textContent = data.total;
+    $('sQty').textContent = data.totalQty;
+    $('sLow').textContent = data.lowStock;
+    $('ls-items').textContent = data.total;
+  } catch(e) { console.error('Stats error:', e); }
+}
+
+/* ── STOCK CARDS ── */
+let searchTimer = null;
+function searchItems(val) {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => loadCards(val), 400);
+}
+
+async function loadCards(search='') {
+  const grid=$('stockGrid');
+  grid.innerHTML='<div class="loading-grid"><div class="spinner"></div><p>Loading…</p></div>';
+  try {
+    const data = await apiFetch('/stock' + (search ? '?search='+encodeURIComponent(search) : ''));
+    renderCards(data.items, search);
+  } catch(e) {
+    grid.innerHTML=`<div class="empty-grid"><div class="ei">⚠</div><p>Failed to load inventory.<br/>${e.message}</p></div>`;
+  }
+}
+
+function renderCards(items, search='') {
+  const grid=$('stockGrid');
+  if (!items || !items.length) {
+    grid.innerHTML=`<div class="empty-grid">
+      <div class="ei">📦</div>
+      <p>${search ? 'No items match "'+esc(search)+'"' : 'No stock items yet.<br/>Add your first item below.'}</p>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = items.map((item,i) => `
+    <div class="stock-card" style="animation-delay:${i*.055}s">
+      <div class="card-photo">
+        ${item.photo ? `<img src="${item.photo}" alt="${esc(item.name)}"/>` : `<span class="no-photo">📦</span>`}
+      </div>
+      <div class="card-body">
+        <div class="card-name" title="${esc(item.name)}">${esc(item.name)}</div>
+        <div class="card-desc">${esc(item.description)||'&mdash;'}</div>
+        <div class="card-foot">
+          <span class="qty-pill ${item.qty<=5?'low':'ok'}">Qty: ${item.qty}</span>
+          <span class="card-date">${item.added ? new Date(item.added).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : ''}</span>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="c-btn edit" onclick="openEdit('${item.id}','${esc(item.name)}',${item.qty},'${esc(item.description||'')}')">✏ Edit</button>
+        <button class="c-btn del"  onclick="openDel('${item.id}','${esc(item.name)}')">🗑 Remove</button>
+      </div>
+    </div>`).join('');
+}
+
+/* ── ADD ITEM ── */
+let photoData = '';
+function pickPhoto(e) {
+  const f=e.target.files[0]; if (!f) return;
+  const r=new FileReader();
+  r.onload=ev=>{ photoData=ev.target.result; const p=$('photoPrev'); p.src=photoData; p.style.display='block'; };
+  r.readAsDataURL(f);
+}
+
+async function addItem() {
+  const name=$('aName').value.trim(), qty=$('aQty').value.trim();
+  const desc=$('aDesc').value.trim(), err=$('addErr'), btn=$('addBtn');
+  if (!name || qty==='') { err.classList.add('show'); setTimeout(()=>err.classList.remove('show'),3000); return; }
+  err.classList.remove('show');
+  btn.disabled=true; btn.textContent='Adding…';
+  try {
+    await apiFetch('/stock', {
+      method:'POST',
+      body: JSON.stringify({ name, qty:parseInt(qty)||0, description:desc, photo:photoData, added:new Date().toISOString() })
+    });
+    ['aName','aQty','aDesc'].forEach(x=>$(x).value='');
+    $('aPhoto').value=''; $('photoPrev').style.display='none'; photoData='';
+    await Promise.all([loadCards(document.querySelector('.search-input')?.value||''), loadStats()]);
+    toast('"'+name+'" added to inventory!','s');
+  } catch(e) {
+    toast('Error: '+e.message,'e');
+  } finally {
+    btn.disabled=false; btn.innerHTML='◆ &nbsp;Add to Inventory';
+  }
+}
+
+/* ── DELETE ── */
+function openDel(id, name) {
+  $('delMsg').textContent = `Remove "${name}" from inventory? This cannot be undone.`;
+  $('delOverlay').classList.add('show');
+  $('delConfBtn').onclick = async () => {
+    try {
+      await apiFetch('/stock/'+id, { method:'DELETE' });
+      closeModal('delOverlay');
+      await Promise.all([loadCards(document.querySelector('.search-input')?.value||''), loadStats()]);
+      toast('"'+name+'" removed.','e');
+    } catch(e) { toast('Error: '+e.message,'e'); }
+  };
+}
+
+/* ── EDIT ── */
+function openEdit(id, name, qty, desc) {
+  $('eName').value=name; $('eQty').value=qty; $('eDesc').value=desc;
+  $('editOverlay').classList.add('show');
+  $('editSaveBtn').onclick = async () => {
+    const n=$('eName').value.trim(), q=$('eQty').value.trim(), d=$('eDesc').value.trim();
+    if (!n||q==='') { toast('Name and Quantity are required!','e'); return; }
+    try {
+      await apiFetch('/stock/'+id, { method:'PUT', body:JSON.stringify({name:n,qty:parseInt(q)||0,description:d}) });
+      closeModal('editOverlay');
+      await Promise.all([loadCards(document.querySelector('.search-input')?.value||''), loadStats()]);
+      toast('"'+n+'" updated!','s');
+    } catch(e) { toast('Error: '+e.message,'e'); }
+  };
+}
+
+function closeModal(id) { $(id).classList.remove('show'); }
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('overlay'))
+    document.querySelectorAll('.overlay').forEach(m=>m.classList.remove('show'));
+});
+
+/* ── TOAST ── */
+function toast(msg, type='s') {
+  const w=$('toastWrap'), t=document.createElement('div');
+  t.className='toast '+type; t.textContent=msg; w.appendChild(t);
+  setTimeout(()=>{ t.style.transition='all .4s'; t.style.opacity='0'; t.style.transform='translateX(40px)'; setTimeout(()=>t.remove(),400); },3200);
+}
+
+/* ── CLOCK ── */
+function startClock() {
+  const el=$('clock');
+  const tick=()=>el.textContent=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  tick(); setInterval(tick,1000);
+}
+
+/* ── ESCAPE ── */
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ── INIT ── */
+(async () => {
+  const sess = getSess();
+  if (sess?.token && sess?.user) {
+    showWelcome(sess.user);
+  } else {
+    showPage('loginPage');
+    // Load public stats for login page
+    try {
+      const data = await fetch(API + '/stats', { headers: { Authorization: 'Bearer ' } })
+        .then(r=>r.json()).catch(()=>null);
+      if (data?.total !== undefined) $('ls-items').textContent = data.total;
+    } catch {}
+  }
+})();
+</script>
+</body>
+</html>
